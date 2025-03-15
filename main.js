@@ -51,9 +51,16 @@ const saveClient = () => {
             celular: document.getElementById('celular').value,
             cidade: document.getElementById('cidade').value
         }
-        createClient(client)
-        updateTable()
-        closeModal()
+        const index = document.getElementById('nome').dataset.index
+        if (index == 'new'){
+            createClient(client)
+            updateTable()
+            closeModal()
+        } else{
+            updateClient(index, client)
+            updateTable()
+            closeModal()
+        }
     }
 }
 
@@ -83,9 +90,19 @@ const updateTable = () => {
     dbClient.forEach(createRow)
 }
 
+const fillFields = (client) => {
+    document.getElementById('nome').value = client.nome
+    document.getElementById('email').value = client.email
+    document.getElementById('celular').value = client.celular
+    document.getElementById('cidade').value = client.cidade
+    document.getElementById('nome').dataset.index = client.index
+}
+
 const editClient = (index) => {
     const client = readClient()[index]
-    fillFields
+    client.index = index
+    fillFields(client)
+    openModal()
 }
 
 const editDelete = (event) => {
@@ -96,7 +113,12 @@ const editDelete = (event) => {
         if (action == 'edit') {
             editClient(index)
         } else {
-            deleteClient(index)
+            const client = readClient()[index]
+            const response = confirm(`Deseja realmente excluir ${client.nome}?`)
+            if (response){
+                deleteClient(index)
+                updateTable()
+            }
         }
     }
 }
@@ -110,6 +132,9 @@ document.getElementById('cadastrarCliente')
     .addEventListener('click', openModal)
 
 document.getElementById('modalClose')
+    .addEventListener('click', closeModal)
+
+document.getElementById('cancelar')
     .addEventListener('click', closeModal)
 
 document.getElementById('salvar')
